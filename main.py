@@ -5,14 +5,15 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QPushButton, QTableWidget, QListWidget, QAbstractItemView,
                              QTableWidgetItem, QHeaderView)
 
+
 class FilmOneriApp(QMainWindow):
     def __init__(self):
         super().__init__()
 
         self.setWindowTitle("Film Öneri Platformu")
-        self.setGeometry(100, 100, 1100, 600)
+        self.setGeometry(100, 100, 1100, 620)
 
-        # Modern Karanlık Tema (Dark Mode) Stilleri
+        # Dark Mod
         self.setStyleSheet("""
             QMainWindow {
                 background-color: #1e1e2e;
@@ -68,11 +69,8 @@ class FilmOneriApp(QMainWindow):
         self.df = pd.DataFrame()
         self.genre_columns = []
         self.platform_columns = []
-
         # Veriyi yükle
         self.load_data()
-
-        # Ana Widget ve Layout
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
         self.main_layout = QVBoxLayout(self.central_widget)
@@ -89,21 +87,25 @@ class FilmOneriApp(QMainWindow):
             print("Dosya okunurken bir hata oluştu:", e)
 
     def setup_ui(self):
-        # --- Üst Kısım: Filtreler ---
+        # Filtrelemeler
         filter_layout = QHBoxLayout()
+        filter_layout.setSpacing(35)
 
         # Yıl Filtresi
         year_layout = QVBoxLayout()
+        year_layout.setSpacing(10)
         year_label = QLabel("Minimum Yıl:")
         self.year_spinbox = QSpinBox()
         self.year_spinbox.setRange(1900, 2030)
         self.year_spinbox.setValue(2010)
         year_layout.addWidget(year_label)
         year_layout.addWidget(self.year_spinbox)
+        year_layout.addStretch()
         filter_layout.addLayout(year_layout)
 
         # IMDB Filtresi
         imdb_layout = QVBoxLayout()
+        imdb_layout.setSpacing(10)
         imdb_label = QLabel("Minimum IMDB:")
         self.imdb_spinbox = QDoubleSpinBox()
         self.imdb_spinbox.setRange(0.0, 10.0)
@@ -111,10 +113,12 @@ class FilmOneriApp(QMainWindow):
         self.imdb_spinbox.setValue(7.0)
         imdb_layout.addWidget(imdb_label)
         imdb_layout.addWidget(self.imdb_spinbox)
+        imdb_layout.addStretch()
         filter_layout.addLayout(imdb_layout)
 
-        # Tür Filtresi (Çoklu Seçim)
+        # Tür Filtresi
         genre_layout = QVBoxLayout()
+        genre_layout.setSpacing(10)
         genre_label = QLabel("Türler:")
         self.genre_list = QListWidget()
         self.genre_list.setSelectionMode(QAbstractItemView.MultiSelection)
@@ -124,8 +128,9 @@ class FilmOneriApp(QMainWindow):
         genre_layout.addWidget(self.genre_list)
         filter_layout.addLayout(genre_layout)
 
-        # Platform Filtresi (Çoklu Seçim)
+        # Platform Filtresi
         platform_layout = QVBoxLayout()
+        platform_layout.setSpacing(10)
         platform_label = QLabel("Platformlar:")
         self.platform_list = QListWidget()
         self.platform_list.setSelectionMode(QAbstractItemView.MultiSelection)
@@ -136,22 +141,24 @@ class FilmOneriApp(QMainWindow):
         filter_layout.addLayout(platform_layout)
 
         self.main_layout.addLayout(filter_layout)
+        self.main_layout.addSpacing(15)
 
         # Filtrele Butonu
         self.filter_btn = QPushButton("Filmleri Filtrele")
         self.filter_btn.clicked.connect(self.filter_movies)
         self.main_layout.addWidget(self.filter_btn)
+        self.main_layout.addSpacing(15)
 
-        # --- Orta Kısım: Tablo ---
+        # Tablo
         self.table = QTableWidget()
         self.table.setColumnCount(5)
         self.table.setHorizontalHeaderLabels(["Başlık", "Yıl", "IMDB Puanı", "Türler", "Platformlar"])
         self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
-        self.table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents) # Türler uzasın
-        self.table.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeToContents) # Platform uzasın
+        self.table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeToContents)
         self.main_layout.addWidget(self.table)
 
-        # --- Alt Kısım: İstatistikler ---
+        # İstatistikler
         stats_layout = QHBoxLayout()
         self.mean_label = QLabel("Ortalama IMDB: -")
         self.median_label = QLabel("Medyan IMDB: -")
@@ -195,7 +202,7 @@ class FilmOneriApp(QMainWindow):
             if valid_platform_cols:
                 filtered_df = filtered_df[filtered_df[valid_platform_cols].sum(axis=1) > 0]
 
-        # Tabloyu Doldur
+        # Tabloya Yazma
         self.table.setRowCount(0)
         for index, row in filtered_df.iterrows():
             row_pos = self.table.rowCount()
@@ -225,7 +232,7 @@ class FilmOneriApp(QMainWindow):
             self.mean_label.setText("Ortalama IMDB: -")
             self.median_label.setText("Medyan IMDB: -")
 
-# UYGULAMAYI ÇALIŞTIRAN BLOK (EN SOLA HİZALANDI)
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = FilmOneriApp()
